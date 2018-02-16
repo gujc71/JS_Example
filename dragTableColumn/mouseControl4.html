@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Mouse Control Example</title>
+<style>
+.selector {
+    position: absolute;
+    border: 1px dotted ;
+}
+.rectangle{
+    position: absolute;
+    border: 1px solid;
+}
+</style>    
+<script>
+// move shape 
+var selector = null;
+var sPos = null;
+var actionType = 0;       // 0: none, 1: make shape, 2: move shape
+var actionTarget = null;
+
+window.onload = function() {
+    selector = document.getElementsByClassName("selector")[0];
+    selector.style.display = "none";
+        
+    document.onselectstart = function() { return false }
+    document.onmousedown = mousedown;
+    document.onmousemove = mousemove;
+    document.onmouseup   = mouseup;
+}
+
+function mousedown(ev){
+    sPos = {x: ev.pageX, y: ev.pageY};
+
+    if (ev.target.nodeName === "DIV") {
+        actionType = 2;
+        actionTarget = ev.target;
+    } else {
+        setPosition(selector, {x1: ev.pageX, y1: ev.pageY, x2: 0, y2: 0});
+        selector.style.display = "";
+        actionType = 1;
+    }
+}
+
+function mousemove(ev){
+    if (sPos === null) { return;}
+
+    if (actionType === 1) {
+        setPosition(selector, calcPosition(sPos, {x2: ev.pageX, y2: ev.pageY}));
+    } else{
+        actionTarget.style.left =  parseInt(actionTarget.style.left) + (ev.pageX-sPos.x) + "px";
+        actionTarget.style.top  =  parseInt(actionTarget.style.top)  + (ev.pageY-sPos.y) + "px";
+        sPos = {x: ev.pageX, y: ev.pageY};
+    }
+}
+
+function mouseup(ev){
+    var rt = calcPosition(sPos, {x2: ev.pageX, y2: ev.pageY});
+    
+    if (actionType === 1) {
+        setPosition(selector, rt);
+        selector.style.display = "none";
+        
+        var node = document.createElement("div");
+        document.body.appendChild(node);
+        node.className = "rectangle";
+        setPosition(node, rt);
+    }
+    sPos = null;
+    actionType = 0;
+    actionTarget = null;
+}
+
+function calcPosition(pos, size){
+    return {x1: Math.min(pos.x, size.x2), y1: Math.min(pos.y, size.y2), 
+            x2: Math.abs(size.x2-sPos.x), y2: Math.abs(size.y2-sPos.y)};
+}
+
+function setPosition(obj, rt){
+    obj.style.left   = rt.x1 + "px";
+    obj.style.top    = rt.y1 + "px";
+    obj.style.width  = rt.x2 + "px";
+    obj.style.height = rt.y2 + "px";
+}
+</script>
+</head>
+<body>
+<div class="selector" style="left: 100px; top: 100px;">
+</div> 
+</body>
+</html>

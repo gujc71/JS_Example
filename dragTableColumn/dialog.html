@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>new Dialog</title>
+<style>
+.dialog{
+    position: absolute;
+    width: 400px;
+    border: 1px solid;
+}
+.head{
+    width: calc(400-10)px;
+    height: 30px;
+    background-color: skyblue;
+    padding: 5px;
+    text-align: center;
+    cursor:move;
+}
+.body{
+    width: calc(400-10)px;
+    height: 200px;
+    padding: 5px;
+}
+</style>    
+<script>
+var head = null;
+window.onload = function() {
+    head = document.getElementsByClassName("head")[0];
+    head.onmousedown = mousedown;
+    
+    document.documentElement.onmousemove = mousemove;
+    document.documentElement.onmouseup = mouseup;
+}
+var sPos = null;
+function mousedown(ev){
+    sPos = {x: ev.pageX, y: ev.pageY};
+}
+function mousemove(ev){
+    if (sPos === null) { return;}
+    var x = ev.pageX-sPos.x;
+    var y = ev.pageY-sPos.y;
+    console.log(x);
+    var dialog = head.parentNode;
+    dialog.style.left= (parseInt(dialog.style.left) + x) + "px";
+    dialog.style.top = (parseInt(dialog.style.top)  + y) + "px";
+    sPos = {x: ev.pageX, y: ev.pageY};
+}
+function mouseup(ev){
+    sPos = null;
+}
+</script>
+</head>
+<body>
+<div class="dialog" style="left: 100px; top: 100px;">
+    <div class="head">팝업 창 헤드</div>
+    <div class="body">
+        팝업 창 헤드를 마우스 버튼으로 누른 상태에서 움직여 보세요.
+    </div>
+</div> 
+</body>
+</html>

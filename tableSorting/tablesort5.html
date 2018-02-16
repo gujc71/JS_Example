@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv='cache-control' content='no-cache'/>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+<title>Table Sorter</title>
+<script>
+/*
+ Ascendeing / Descending, IF 문 이용, nextSibling
+ */
+var data = [
+            ['name', 'Java', 'Node', 'Perl'],
+            ['Gu', 80, 70, 30],
+            ['Kim', 90, 60, 80],
+            ['Lee', 70, 70, 70],
+            ['Brad', 50, 90, 90]
+           ];
+
+window.onload = function(){
+    var table = document.createElement('table');
+    var targetPn = document.getElementById ('targetPn');
+    targetPn.appendChild(table);
+    table.border = 1;
+    table.width = 200;
+    
+    for (var i=0; i<data.length; i++){
+        var tr = document.createElement('tr');
+        table.appendChild(tr);
+        for (var j=0; j<data[i].length; j++){
+            var td = document.createElement('td');
+            tr.appendChild(td);
+            td.innerHTML = data[i][j];
+        }
+    }
+}
+
+var sortType = 'asc';
+function sortTable(){
+    sortType = (sortType === 'asc') ? 'desc':'asc';
+
+    var table = document.getElementsByTagName('table');
+    var rows = table[0].rows;
+    var chkSort = true;
+    
+    while (chkSort){
+        chkSort = false;
+        for (var i = 1; i < (rows.length - 1); i++) {
+            var row = rows[i];
+            var fCell = row.cells[cellIndex].innerHTML.toLowerCase();
+            var sCell = row.nextSibling.cells[cellIndex].innerHTML.toLowerCase();
+            if ( (sortType === 'asc'  && fCell > sCell)             // innerHTML.toLowerCase() 중복 처리
+              || (sortType === 'desc' && fCell < sCell) ) {
+                row.parentNode.insertBefore(row.nextSibling, row);
+                chkSort = true;
+            }
+        }    
+    }
+}
+
+</script>
+</head>
+<body>
+    <button type='button' onclick='sortTable()'>Sort</button>
+    <div id='targetPn' style='width:130px'>
+    </div>
+</body>
+</html>

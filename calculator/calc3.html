@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="cache-control" content="no-cache"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Calculator</title>
+<style>
+button {
+    width: 30px;
+}
+</style>
+<script>
+// 동적 생성: createElement, forEach
+window.onload = function(){
+    var calPn = document.getElementById ('calPn');
+    var calArr = [1,2,3,'+', 4,5,6,'-', 7,8,9,'*', '0','=','c','/'];
+    calArr.forEach(function(e, i){
+        var button = document.createElement('button');
+        calPn.appendChild(button);
+        button.innerText = e;
+        button.addEventListener('click', buttonClick);
+        if ( (i+1) % 4===0) {
+            calPn.appendChild(document.createElement('br'));
+        }
+    });
+}
+
+function buttonClick() {
+    var inputNumber = document.getElementById ('inputNumber');
+    var value = this.innerText;
+    switch(value) {
+    case '=':
+        inputNumber.value = eval(inputNumber.value);
+        break;
+    case 'c':
+        inputNumber.value = '';
+        break;
+    default:
+        inputNumber.value += value;
+    } 
+}
+
+</script>
+</head>
+<body>
+    <div id='calPn'>
+        <input type="text" id="inputNumber"/><br/>
+    </div>
+</body>
+</html>

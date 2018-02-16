@@ -1,0 +1,95 @@
+
+<canvas id="tetrisCanvas" width="100" height="100"></canvas>
+<button onclick="leftBtnClick()">Rotate Left</button>
+<button onclick="rightBtnClick()">Rotate Right</button>
+<button onclick="getNextShape()">Next shape</button>
+
+<script>
+// rotate shape
+// source: https://github.com/jstimpfle/tetris-on-a-plane/
+var canvas = document.getElementById('tetrisCanvas');
+var ctx = canvas.getContext('2d');
+
+var shapes = [
+   [[0, 0, 0, 0],        // 'O'
+    [0, 1, 1, 0],
+    [0, 1, 1, 0],
+    [0, 0, 0, 0]],
+   [[0, 0, 1, 0],        // 'I'
+    [0, 0, 1, 0],
+    [0, 0, 1, 0],
+    [0, 0, 1, 0]],
+   [[0, 0, 0, 0],        // 'T'
+    [1, 1, 1, 0],
+    [0, 1, 0, 0],
+    [0, 0, 0, 0]],
+   [[0, 0, 0, 0],        // 'S'
+    [0, 0, 1, 1],
+    [0, 1, 1, 0],
+    [0, 0, 0, 0]],
+   [[0, 0, 0, 0],        // 'Z'
+    [0, 1, 1, 0],
+    [0, 0, 1, 1],
+    [0, 0, 0, 0]],
+   [[0, 0, 1, 0],        // 'J'
+    [0, 0, 1, 0],
+    [0, 1, 1, 0],
+    [0, 0, 0, 0]],
+   [[0, 1, 0, 0],        // 'L'
+    [0, 1, 0, 0],
+    [0, 1, 1, 0],
+    [0, 0, 0, 0]]
+];
+
+var curShape = shapes[0], curShapeType = 0;;
+draw();
+
+function draw() {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 100, 100);
+    ctx.fillStyle = 'black';
+
+    for (var y = 0; y < 4; y++) {
+        for (var x = 0; x < 4; x++) {
+            if (curShape[y][x]) {
+                ctx.fillRect(x * 20, y * 20, 19, 19);
+            }
+        }
+    }
+}
+
+function getNextShape() {
+    curShapeType = (curShapeType + 1) % 7;
+    curShape = shapes[curShapeType]
+    draw();
+}
+
+function leftBtnClick() {
+    curShape = rotateLeft(curShape);
+    draw();
+}
+
+function rightBtnClick() {
+    curShape = rotateRight(curShape);
+    draw();
+}
+
+function rotateLeft(piece) {
+    return [
+            [piece[0][3], piece[1][3], piece[2][3], piece[3][3]],
+            [piece[0][2], piece[1][2], piece[2][2], piece[3][2]],
+            [piece[0][1], piece[1][1], piece[2][1], piece[3][1]],
+            [piece[0][0], piece[1][0], piece[2][0], piece[3][0]]
+    ];
+}
+
+function rotateRight(piece) {
+    return [
+            [piece[3][0], piece[2][0], piece[1][0], piece[0][0]],
+            [piece[3][1], piece[2][1], piece[1][1], piece[0][1]],
+            [piece[3][2], piece[2][2], piece[1][2], piece[0][2]],
+            [piece[3][3], piece[2][3], piece[1][3], piece[0][3]]
+    ];
+}
+
+</script>

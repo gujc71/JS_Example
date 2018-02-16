@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Mouse Control Example</title>
+<style>
+.selector {
+    position: absolute;
+    border: 1px dotted ;
+}
+</style>    
+<script>
+// draw select area : minus position
+var selector = null;
+var sPos = null;
+
+window.onload = function() {
+    selector = document.getElementsByClassName("selector")[0];
+    selector.style.display = "none";
+        
+    document.onselectstart = function() { return false }
+    document.documentElement.onmousedown = mousedown;
+    document.documentElement.onmousemove = mousemove;
+    document.documentElement.onmouseup   = mouseup;
+}
+
+function mousedown(ev){
+    sPos = {x: ev.pageX, y: ev.pageY};
+    setPosition({x1: ev.pageX, y1: ev.pageY, x2: 0, y2: 0});
+    selector.style.display = "";
+}
+
+function mousemove(ev){
+    if (sPos === null) { return;}
+
+    setPosition(calcPosition(sPos, {x2: ev.pageX, y2: ev.pageY}));
+}
+
+function mouseup(ev){
+    setPosition(calcPosition(sPos, {x2: ev.pageX, y2: ev.pageY}));
+    selector.style.display = "none";
+    sPos = null;
+}
+
+function calcPosition(pos, size){
+    return {x1: Math.min(pos.x, size.x2), y1: Math.min(pos.y, size.y2), 
+            x2: Math.abs(size.x2-sPos.x), y2: Math.abs(size.y2-sPos.y)};
+}
+
+function setPosition(rt){
+    selector.style.left   = rt.x1 + "px";
+    selector.style.top    = rt.y1 + "px";
+    selector.style.width  = rt.x2 + "px";
+    selector.style.height = rt.y2 + "px";
+}
+</script>
+</head>
+<body>
+<div class="selector" style="left: 100px; top: 100px;">
+</div> 
+</body>
+</html>

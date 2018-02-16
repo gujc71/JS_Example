@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+<title>Board Sample</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script>
+// remove data
+var app = angular.module("myApp", []);
+
+app.controller("myCtrl", function($scope) {
+    $scope.boardlist = [
+        {id: 1, title: 'Title1', writer: 'Writer1'}, 
+        {id: 2, title: 'Title2', writer: 'Writer2'}
+    ];
+    
+    $scope.remove = function (id) {
+        if (!id) return;
+
+        var idx = -1;
+        for (var i = 0; i < $scope.boardlist.length; i++) {
+            if ($scope.boardlist[i].id === id) {
+                idx = i;
+                break;
+            }
+        }
+/*        var idx = $scope.boardlist.findIndex(function (item) {
+            return item.id === id;
+        });*/
+
+        if (idx === -1) return;
+        $scope.boardlist.splice(idx, 1);
+    }
+});
+</script>     
+</head>
+<body>
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <table border="1">
+            <tr>
+                <td style="width: 50px">No.</td>
+                <td style="width: 200px">제목</td>
+                <td style="width: 50px">Name</td>
+                <td style="width: 50px"></td>
+            </tr>
+            <tr ng-repeat="item in boardlist">
+                <td style="width: 50px">{{$index+1}}</td>
+                <td style="width: 200px">{{item.title}}</td>
+                <td style="width: 50px">{{item.writer}}</td>
+                <td style="width: 50px"><button type="button" ng-click="remove(item.id)">삭제</button></td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv='cache-control' content='no-cache'/>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+<title>Table Sorter</title>
+<script>
+/*
+ sort first cell: for -> while 
+ 한번만 처리하기 때문에 Brad가 제대로 정렬되지 않음.  
+ 정렬이 발생하지 않을때까지 반복
+ */
+var data = [
+            ['name', 'Java', 'Node', 'Perl'],
+            ['Gu', 80, 70, 30],
+            ['Kim', 90, 60, 80],
+            ['Lee', 70, 70, 70],
+            ['Brad', 50, 90, 90]
+           ];
+
+window.onload = function(){
+    var table = document.createElement('table');
+    var targetPn = document.getElementById ('targetPn');
+    targetPn.appendChild(table);
+    table.border = 1;
+    table.width = 200;
+    
+    for (var i=0; i<data.length; i++){
+        var tr = document.createElement('tr');
+        table.appendChild(tr);
+        for (var j=0; j<data[i].length; j++){
+            var td = document.createElement('td');
+            tr.appendChild(td);
+            td.innerHTML = data[i][j];
+        }
+    }
+}
+
+function sortTable(){
+    var table = document.getElementsByTagName('table');
+    var rows = table[0].rows;
+    var chkSort = true;
+    while (chkSort){
+        chkSort = false;
+        for (var i = 1; i < (rows.length - 1); i++) {
+            var fCell = rows[i].cells[0];
+            var sCell = rows[i + 1].cells[0];
+            if (fCell.innerHTML.toLowerCase() > sCell.innerHTML.toLowerCase()) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                chkSort = true;
+            }
+        }    
+    }
+}
+           
+</script>
+</head>
+<body>
+    <button type='button' onclick='sortTable()'>Sort</button>
+    <div id='targetPn' style='width:130px'>
+    </div>
+</body>
+</html>

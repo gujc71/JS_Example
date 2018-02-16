@@ -1,0 +1,146 @@
+<canvas id="tetrisCanvas" width="200" height="400"></canvas>
+<button onclick="moveShape(-1)">Left</button>
+<button onclick="rotateShape()">Rotate</button>
+<button onclick="moveShape(1)">Right</button>
+<button onclick="dropShape()">Drop</button>
+
+<script>
+//  control shapes
+var canvas = document.getElementById('tetrisCanvas');
+var ctx = canvas.getContext('2d');
+var shapes = [
+   [[1, 1, 0, 0],        // 'O'
+    [1, 1, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+   [[0, 0, 1, 0],        // 'I'
+    [0, 0, 1, 0],
+    [0, 0, 1, 0],
+    [0, 0, 1, 0]],
+   [[1, 1, 1, 0],        // 'T'
+    [0, 1, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+   [[0, 1, 1, 0],        // 'S'
+    [1, 1, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+   [[1, 1, 0, 0],        // 'Z'
+    [0, 1, 1, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+   [[0, 1, 0, 0],        // 'J'
+    [0, 1, 0, 0],
+    [1, 1, 0, 0],
+    [0, 0, 0, 0]],
+   [[1, 0, 0, 0],        // 'L'
+    [1, 0, 0, 0],
+    [1, 1, 0, 0],
+    [0, 0, 0, 0]]
+];
+
+function getNextShape() {
+    curShapeType = Math.floor((Math.random() * 7));
+    return shapes[curShapeType]
+}
+
+var shapeSize = [2,4,3,3,3,3,3];
+var curShapeType = 0, curShape = getNextShape();
+var sPos = {x:3, y:0};
+var gamePanel = [];
+for (var y = 0; y < 20; y++) {
+    gamePanel[y] = [];
+    for (var x = 0; x < 10; x++) {
+        gamePanel[y][x] = 0;
+    }
+}    
+
+var intervalHandler = setInterval(playingTetris, 400);    
+    
+function playingTetris() {
+    if ( intersects(sPos.y + 1, sPos.x)) {
+        for (var i = 0; i < 4; i++)
+            for (var j = 0; j < 4; j++)
+                if (curShape[i][j]) {
+                    gamePanel[sPos.y+i][sPos.x+j] = 1;
+                }
+        
+        curShape = getNextShape();        
+        sPos = {x:3, y:0};
+        if ( intersects(sPos.y, sPos.x)) {
+            clearInterval(intervalHandler);
+            alert("Game Over");
+        }
+    } else {
+        sPos.y++;
+    }
+    draw(curShape);
+}    
+
+function intersects(y, x) {
+    for (var i = 0; i < 4; i++)
+        for (var j = 0; j < 4; j++)
+            if (curShape[i][j])
+                if (y+i >= 20 || x+j < 0 || x+j >= 10 || gamePanel[y+i][x+j])
+                    return true;
+    return false;
+}
+
+function draw() {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 200, 400);
+    ctx.rect(0, 0, 200, 400);
+    ctx.strokeStyle="blue";
+    ctx.stroke(); 
+    
+    ctx.fillStyle = 'black';
+    for (var y = 0; y < gamePanel.length; y++) {
+        for (var x = 0; x < gamePanel[y].length; x++) {
+            if (gamePanel[y][x]) {
+                ctx.fillRect(x * 20, y * 20, 19, 19);
+            }
+        }
+    }
+
+    for (var y = 0; y < 4; y++) {
+        for (var x = 0; x < 4; x++) {
+            if (curShape[y][x]) {
+                ctx.fillRect((sPos.x+x) * 20, (sPos.y+y) * 20, 19, 19);
+            }
+        }
+    }
+}
+
+function moveShape(value) {
+    if ( !intersects(sPos.y, sPos.x+value)) {
+        sPos.x += value;
+        draw();
+    }
+}
+
+function dropShape() {
+    for (var y=sPos.y; y<20; y++) {
+        if ( !intersects(sPos.y+1, sPos.x)) {
+            sPos.y++;
+            draw();
+        }
+    }
+}
+
+function rotateShape() {
+    var ret = [];
+    for (var y = 0; y < 4; y++) {
+        ret[y] = curShape[y].slice();
+    }
+    
+    var size = shapeSize[curShapeType];
+    for (var y = 0; y < size; y++) {
+        for (var x = 0; x < size; x++) {
+            ret[y][x] = curShape[(size-1) - x][y];
+        }
+    }
+    curShape = ret;
+    draw();
+}
+
+</script>

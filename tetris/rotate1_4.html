@@ -1,0 +1,92 @@
+
+<canvas id="tetrisCanvas" width="100" height="100"></canvas>
+<button onclick="leftBtnClick()">Rotate Left</button>
+<button onclick="rightBtnClick()">Rotate Right</button>
+<button onclick="getNextShape()">Next shape</button>
+
+<script>
+// merge two rotate function 
+var canvas = document.getElementById('tetrisCanvas');
+var ctx = canvas.getContext('2d');
+var shapes = [
+
+   [[1, 1, 0, 0],        // 'O'
+    [1, 1, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+   [[0, 0, 1, 0],        // 'I'
+    [0, 0, 1, 0],
+    [0, 0, 1, 0],
+    [0, 0, 1, 0]],
+   [[1, 1, 1, 0],        // 'T'
+    [0, 1, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+   [[0, 1, 1, 0],        // 'S'
+    [1, 1, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+   [[1, 1, 0, 0],        // 'Z'
+    [0, 1, 1, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+   [[0, 1, 0, 0],        // 'J'
+    [0, 1, 0, 0],
+    [1, 1, 0, 0],
+    [0, 0, 0, 0]],
+   [[1, 0, 0, 0],        // 'L'
+    [1, 0, 0, 0],
+    [1, 1, 0, 0],
+    [0, 0, 0, 0]]
+];
+var shapeSize = [2,4,3,3,3,3,3];
+var curShape = shapes[0], curShapeType = 0;;
+var rotateFunction = [function(shape, x, y, size){return shape[x][(size-1) - y]},
+                      function(shape, x, y, size){return shape[(size-1) - x][y]}];
+
+draw();
+
+function draw() {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 100, 100);
+    ctx.fillStyle = 'black';
+    for (var y = 0; y < 4; y++) {
+        for (var x = 0; x < 4; x++) {
+            if (curShape[y][x]) {
+                ctx.fillRect(x * 20, y * 20, 19, 19);
+            }
+        }
+    }
+}
+function getNextShape() {
+    curShapeType = (curShapeType + 1) % 7;
+    curShape = shapes[curShapeType]
+    draw();
+}
+
+function leftBtnClick() {
+    curShape = rotateShape(curShape, rotateFunction[0]);
+    draw();
+}
+
+function rightBtnClick() {
+    curShape = rotateShape(curShape, rotateFunction[1]);
+    draw();
+}
+    
+function rotateShape(shape, fn_getPeice) {
+    var ret = [];
+    for (var y = 0; y < 4; y++) {
+        ret[y] = shape[y].slice();
+    }
+
+    var size = shapeSize[curShapeType];
+    for (var y = 0; y < size; y++) {
+        for (var x = 0; x < size; x++) {
+            ret[y][x] = fn_getPeice(shape, x, y, size);
+        }
+    }
+    return ret;
+}
+
+</script>

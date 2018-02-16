@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Mouse Control Example</title>
+<style>
+.selector {
+    position: absolute;
+    border: 1px dotted ;
+}
+</style>    
+<script>
+var selector = null;
+var sPos = null;
+window.onload = function() {
+    selector = document.getElementsByClassName("selector")[0];
+    selector.style.display = "none";
+        
+    document.onselectstart = function() { return false }
+    document.documentElement.onmousedown = mousedown;
+    document.documentElement.onmousemove = mousemove;
+    document.documentElement.onmouseup   = mouseup;
+}
+
+function mousedown(ev){
+    sPos = {x: ev.pageX, y: ev.pageY};
+    selector.style.left = ev.pageX + "px";
+    selector.style.top  = ev.pageY + "px";
+    selector.style.width   = "0px";
+    selector.style.height  = "0px";
+    selector.style.display = "";
+}
+
+function mousemove(ev){
+    if (sPos === null) { return;}
+
+    selector.style.width   = (ev.pageX-sPos.x) + "px";
+    selector.style.height  = (ev.pageY-sPos.y) + "px";
+}
+
+function mouseup(ev){
+    selector.style.width   = (ev.pageX-sPos.x) + "px";
+    selector.style.height  = (ev.pageY-sPos.y) + "px";
+    selector.style.display = "none";
+    sPos = null;
+}
+</script>
+</head>
+<body>
+<div class="selector" style="left: 100px; top: 100px;">
+</div> 
+</body>
+</html>
