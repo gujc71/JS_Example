@@ -6,7 +6,7 @@
 <title>Board Sample</title>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 <script>
-// add data
+// add data : bind
 var app = angular.module("myApp", []);
 
 app.controller("myCtrl", function($scope) {
@@ -14,6 +14,7 @@ app.controller("myCtrl", function($scope) {
         {id: 1, title: 'Title1', writer: 'Writer1'}, 
         {id: 2, title: 'Title2', writer: 'Writer2'}
     ];
+	$scope.boardForm = {};
     
     $scope.removeBoard = function (id) {
         if (!id) return;
@@ -33,11 +34,17 @@ app.controller("myCtrl", function($scope) {
         $scope.boardlist.splice(idx, 1);
     }
 
-    $scope.addBoard = function (item) {
-        if (!item) return;
+    $scope.addBoard = function () {
 
-        item.id = ! $scope.boardlist.length ? 1 : $scope.boardlist[$scope.boardlist.length - 1].id + 1;
-        $scope.boardlist.push(item);
+        var newId = ! $scope.boardlist.length ? 1 : $scope.boardlist[$scope.boardlist.length - 1].id + 1;
+        
+        var newItem = {
+            id: newId,
+            title: $scope.boardForm.title,
+            writer: $scope.boardForm.writer
+        };
+
+        $scope.boardlist.push(newItem);
     }
 });
 
@@ -45,9 +52,9 @@ app.controller("myCtrl", function($scope) {
 </head>
 <body>
     <div ng-app="myApp" ng-controller="myCtrl">
-        <form ng-submit="addBoard(board)">
-            Title: <input type="text" ng-model="board.title" autofocus> <br/>
-            Name: <input type="text" ng-model="board.writer"><br/>
+        <form ng-submit="addBoard()">
+            Title: <input type="text" ng-model="boardForm.title" autofocus> <br/>
+            Name: <input type="text" ng-model="boardForm.writer"><br/>
             <button type="submit">Add</button>
         </form>
 
