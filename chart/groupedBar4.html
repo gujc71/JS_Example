@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.bar {
+    _fill: skyblue;
+}
+
+.bar:hover {
+    fill: skyblue;
+}
+
+.text {
+    fill: white;
+    font-weight:bold;
+    font-size: 11px;
+}
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.toolTip {
+    position: absolute;
+    border: 0 none;
+    border-radius: 4px 4px 4px 4px;
+    background-color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 11px;
+}
+</style>
+<svg width="500" height="300"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+// change series I
+/*
+    2016   2017
+A     9    17
+B    19    27
+C    29    37
+D    39    27
+E    29    17
+F    19     7
+G     9     0
+*/
+var margin = {left: 20, top: 10, right: 10, bottom: 20};
+var series = ["A", "B", "C", "D", "E", "F", "G"];
+var dataset = [ {'2016': 9, '2017':17}, 
+                {'2016':19, '2017':27},     
+                {'2016':29, '2017':37},     
+                {'2016':39, '2017':27},     
+                {'2016':29, '2017':17},     
+                {'2016':19, '2017': 7},     
+                {'2016': 9, '2017': 0}];
+
+var svg = d3.select("svg");
+var width  = parseInt(svg.style("width"), 10) - margin.left - margin.right;
+var height = parseInt(svg.style("height"), 10)- margin.top  - margin.bottom;
+
+var svgG = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var xScale0 = d3.scaleBand()
+    .domain(series.map(function(d) { return d;} ))
+    .rangeRound([0, width]).padding(0.2);
+    
+var keys = d3.keys(dataset[0]);
+    
+var xScale1 = d3.scaleBand()
+    .domain(keys)
+    .rangeRound([0, xScale0.bandwidth()]).padding(0.2);
+
+var yScale = d3.scaleLinear()
+    .domain([0, d3.max(dataset, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice()
+    .range([height, 0]);
+
+var colors = d3.scaleOrdinal(d3.schemeCategory20b);
+    
+svgG.append("g")            
+    .attr("class", "grid")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale0)
+        .tickSize(-height)
+    );
+    
+svgG.append("g")
+    .attr("class", "grid")
+    .call(d3.axisLeft(yScale)
+        .ticks(5)
+        .tickSize(-width)
+    );
+    
+var barG = svgG.append("g")
+    .selectAll("g")
+    .data(dataset)
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(" + xScale0(series[i]) + ",0)"; });
+      
+barG.selectAll("rect")
+    .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter().append("rect")
+        .attr("class", "bar")
+        .attr("height", function(d) { return height - yScale(d.value); })
+        .attr("width", xScale1.bandwidth())
+        .attr("x", function(d) {return xScale1(d.key); })
+        .attr("y", function(d) { return yScale(d.value); })
+        .attr("fill",   function(d) { return colors(d.key); })
+        .on("mouseover", function() { tooltip.style("display", null); })
+        .on("mouseout",  function() { tooltip.style("display", "none"); })
+        .on("mousemove", function(d) {
+            tooltip.style("left", (d3.event.pageX+10)+"px");
+            tooltip.style("top",  (d3.event.pageY-10)+"px");
+            tooltip.html(d.key + "<br/>" + d.value);
+        });    
+
+barG.selectAll("text")
+    .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter().append("text")
+    .text(function(d) {return d.value})
+        .attr("class", "text")
+        .attr("x", function(d, i) {return xScale1(d.key)+xScale1.bandwidth()/2})
+        .style("text-anchor", "middle")
+        .attr("y", function(d, i) {return yScale(d.value) + 15});      
+
+var tooltip = d3.select("body").append("div").attr("class", "toolTip").style("display", "none");
+
+var legend = svgG.append("g")
+    .attr("text-anchor", "end")
+    .selectAll("g")
+    .data(keys)
+    .enter().append("g")
+    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width - 20)
+      .attr("width", 19)
+      .attr("height", 19)
+      .attr("fill", colors);
+
+  legend.append("text")
+      .attr("x", width - 30)
+      .attr("y", 9.5)
+      .attr("dy", "0.32em")
+      .text(function(d) { return d; });
+      
+</script>

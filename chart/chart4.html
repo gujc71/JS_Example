@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.bar {
+    fill: skyblue;
+}
+
+.bar:hover {
+    fill: blue;
+}
+</style>
+<svg width="500" height="300"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+// 챠트에 값 출력
+var dataset = [9, 19, 29, 39, 29, 19, 9];
+
+var svg = d3.select("svg");
+
+svg.selectAll("rect")
+    .data(dataset)
+    .enter().append("rect")
+        .attr("class", "bar")
+        .attr("height", function(d, i) {return (d*5)})
+        .attr("width", 40)
+        .attr("x", function(d, i) {return (50 * i)})
+        .attr("y", function(d, i) {return (250-d*5)});
+
+svg.selectAll("text")
+    .data(dataset)
+    .enter().append("text")
+    .text(function(d) {return d})
+        .attr("x", function(d, i) {return 50 * i})
+        .attr("y", function(d, i) {return 250-d*5});
+           
+</script>

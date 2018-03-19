@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.bar {
+    _fill: skyblue;
+}
+
+.bar:hover {
+    fill: blue;
+}
+
+.text {
+    fill: white;
+    font-weight:bold;
+    font-size: 11px;
+}
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.toolTip {
+    position: absolute;
+    border: 0 none;
+    border-radius: 4px 4px 4px 4px;
+    background-color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 11px;
+}
+</style>
+<svg width="500" height="300"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+// grouped
+/*
+         A     B     C     D     E     F    G
+2016     9    19    29    39    29    19    9
+2017    17    27    37    27    17     7    0
+*/
+var series = ["2016", "2017"];
+
+var dataset = [ {'A': 9, 'B':19, 'C':29, 'D':39, 'E':29, 'F':19, 'G':9}, 
+                {'A':17, 'B':27, 'C':37, 'D':27, 'E':17, 'F':7,  'G':0} ];
+
+var svg = d3.select("svg");
+var width  = parseInt(svg.style("width"), 10) -30;
+var height = parseInt(svg.style("height"), 10)-20;
+
+var svgG = svg.append("g")
+    .attr("transform", "translate(30, 0)");
+
+var xScale0 = d3.scaleBand()
+    .domain(series.map(function(d) { return d;} ))
+    .rangeRound([0, width]).padding(0.2);
+    
+var keys = d3.keys(dataset[0]);
+    
+var xScale1 = d3.scaleBand()
+    .domain(keys)
+    .rangeRound([0, xScale0.bandwidth()]).padding(0.2);
+
+var yScale = d3.scaleLinear()
+    .domain([0, d3.max(dataset, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice()
+    .range([height, 0]);
+
+var colors = d3.scaleOrdinal()
+    .range(["red", "orange", "yellow", "green", "blue", "indigo", "violet"]);
+    
+svgG.append("g")            
+    .attr("class", "grid")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale0)
+        .tickSize(-height)
+    );
+    
+svgG.append("g")
+    .attr("class", "grid")
+    .call(d3.axisLeft(yScale)
+        .ticks(5)
+        .tickSize(-width)
+    );
+    
+var barG = svgG.append("g")
+    .selectAll("g")
+    .data(dataset)
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(" + xScale0(series[i]) + ",0)"; });
+      
+barG.selectAll("rect")
+    .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter().append("rect")
+        .attr("class", "bar")
+        .attr("height", function(d) { return height - yScale(d.value); })
+        .attr("width", xScale1.bandwidth())
+        .attr("x", function(d) { return xScale1(d.key); })
+        .attr("y", function(d) { return yScale(d.value); })
+        .attr("fill",   function(d) { return colors(d.key); });    
+
+barG.selectAll("text")
+    .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter().append("text")
+    .text(function(d) {return d.value})
+        .attr("class", "text")
+        .attr("x", function(d, i) {return xScale1(d.key)+xScale1.bandwidth()/2})
+        .style("text-anchor", "middle")
+        .attr("y", function(d, i) {return yScale(d.value) + 15});      
+
+</script>
